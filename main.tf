@@ -139,7 +139,7 @@ resource "null_resource" "ansible_playbook_centos" {
 	local_file.ansible_host,
   ]
   provisioner "local-exec" {
-    command = "ansible-playbook centos/main.yaml"
+    command = "ansible-playbook centos/main.yaml --extra-vars='{"subnet_cidr":$var.subnet_cidr, "kube_user":$var.ssh_user}'"
   }
 }
 
