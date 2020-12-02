@@ -3,6 +3,7 @@ kind: ClusterConfiguration
 kubernetesVersion: ${k8s_version}
 cloud-provider: gce
 networking:
+  dnsDomain: ${k8s_service_dns}
   podSubnet: ${k8s_pod_cidr} 
 apiServer:
   extraArgs:
@@ -16,6 +17,7 @@ apiServer:
     pathType: FileOrCreate
   certSANs:
   - "cks-master1.c.vmware-ysung.internal"
+  - "cks.${k8s_service_dns}"
 scheduler:
   extraArgs:
     feature-gates: "EphemeralContainers=true"

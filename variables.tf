@@ -43,6 +43,16 @@ variable "k8s_version" {
   default	= "1.19.4"
 }
 
+variable "k8s_cloud_dns_zone" {
+  type = string
+  default = "ysung-public"
+}
+
+variable "k8s_service_dns" {
+  type = string
+  default = "phartdoctor.us"
+}
+
 variable "subnet_cidr" {
   type          = string
   default       = "10.240.0.0/24"

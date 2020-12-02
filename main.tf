@@ -13,6 +13,10 @@ data "google_compute_image" "kubeadm_gce_image" {
 resource "google_compute_network" "cks_network" {
 	name = "cks-vpc"
 	auto_create_subnetworks = false
+  provisioner "local-exec" {
+    when  = destroy
+    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet"
+  }
 }
 
 resource "google_compute_subnetwork" "cks_subnet" {
@@ -49,6 +53,18 @@ resource "google_compute_firewall" "cks_allow_external" {
 	source_ranges = ["0.0.0.0/0"]
 }
 
+resource "google_compute_address" "lb_ext_ip" {
+  name  = "lb-ext-ip"
+}
+
+resource "google_dns_record_set" "k8s_lbs" {
+  name = "cks.phartdoctor.us."
+  type = "A"
+  ttl = 300
+  managed_zone = var.k8s_cloud_dns_zone
+  rrdatas = [google_compute_address.lb_ext_ip.address]
+}
+
 resource "google_compute_instance" "cks-master" {
   name		= "cks-master1"
   machine_type	= var.instance_type
@@ -66,6 +82,7 @@ resource "google_compute_instance" "cks-master" {
     subnetwork	= google_compute_subnetwork.cks_subnet.self_link
     network_ip	= cidrhost(var.subnet_cidr, 11)
     access_config {
+      nat_ip = google_compute_address.lb_ext_ip.address
     }
   }
   can_ip_forward	= true
@@ -100,8 +117,7 @@ resource "google_compute_instance" "cks-workers" {
   tags		= ["kubernetes", "k8s", "worker"]
   service_account {
     scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
-  }
-  
+  } 
 }
 
 resource "local_file" "ansible_host" {
@@ -119,7 +135,7 @@ resource "local_file" "kubeadm_config" {
     {
       k8s_version = var.k8s_version
       k8s_pod_cidr = var.k8s_pod_cidr
-      k8s_service_dns = var.k8s_service_cidr
+      k8s_service_dns = var.k8s_service_dns
     }
   )
   filename = "${path.module}/kubeadm/kubeadm.config"
@@ -139,7 +155,7 @@ resource "null_resource" "ansible_playbook_centos" {
 	local_file.ansible_host,
   ]
   provisioner "local-exec" {
-    command = "ansible-playbook centos/main.yaml --extra-vars='{"subnet_cidr":$var.subnet_cidr, "kube_user":$var.ssh_user}'"
+    command = "ansible-playbook centos/main.yaml"
   }
 }
 
@@ -152,4 +168,13 @@ resource "null_resource" "ansible_playbook_kubeadm" {
   }
 }
 
+
+resource "null_resource" "ansible_playbook_kubectl" {
+  depends_on = [
+  null_resource.ansible_playbook_kubeadm,
+  ]
+  provisioner "local-exec" {
+    command = "ansible-playbook kuubectl/main.yaml"
+  }
+}
 

@@ -5,7 +5,7 @@
     KUBECONFIG: /etc/kubernetes/admin.conf
   tasks:
   - name: Kubeadm reset
-    tags: "reset"
+    tags: reset
     shell: kubeadm reset -f
   - name: copy kubeadm-config
     copy:
@@ -21,7 +21,7 @@
 - hosts: all
   gather_facts: no
   become: yes
-  tags: "cloud-config"
+  tags: cloud-config
   tasks:
   - name: Copy cloud-config
     copy:
@@ -30,7 +30,7 @@
 - hosts: worker
   gather_facts: no
   become: yes
-  tags: "join"
+  tags: join
   environment:
     KUBECONFIG: /etc/kubernetes/admin.conf
   tasks:
@@ -45,14 +45,25 @@
 - hosts: master
   gather_facts: no
   become: yes
-  become_user: ysung
-  tags: "kubeconfig"
+  tags: kubeconfig
   tasks:
-  - name: Setup KUBECONFIG
-    shell: 'mkdir .kube;sudo cp /etc/kubernetes/admin.conf .kube/config; sudo chown -R ysung. .kube'
-  - name: Copy gcp pd storage class
-    copy:
-      src: files/gcp_pd_sc_fast.yaml
-      dest: /tmp/gcp_pd_sc.fast.yaml
+  - name: Fetching admin.conf
+    tags: 
+      - kubeadm_init
+      - kubectl_fetch
+    fetch:
+      src: /etc/kubernetes/admin.conf
+      dest: ~/.kube/config
+      flat: yes
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Ensure the fqdn name of api
+    tags:
+    - local_kube
+    lineinfile:
+      path: ~/.kube/config
+      regexp: '\s\s\s\sserver: https:\/\/10\.240\.0\.11:6443'
+      line: '    server: https://cks.phartdoctor.us:6443'
   - name: apply storage class
-    shell: kubectl apply -f /tmp/gcp_pd_sc.fast.yaml
+    shell: kubectl apply -f files/gcp_pd_sc.fast.yaml
