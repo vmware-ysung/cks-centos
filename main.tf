@@ -168,7 +168,6 @@ resource "null_resource" "ansible_playbook_kubeadm" {
   }
 }
 
-
 resource "null_resource" "ansible_playbook_kubectl" {
   depends_on = [
   null_resource.ansible_playbook_kubeadm,

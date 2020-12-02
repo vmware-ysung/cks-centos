@@ -55,15 +55,3 @@
       src: /etc/kubernetes/admin.conf
       dest: ~/.kube/config
       flat: yes
-- hosts: localhost
-  gather_facts: no
-  tasks:
-  - name: Ensure the fqdn name of api
-    tags:
-    - local_kube
-    lineinfile:
-      path: ~/.kube/config
-      regexp: '\s\s\s\sserver: https:\/\/10\.240\.0\.11:6443'
-      line: '    server: https://cks.phartdoctor.us:6443'
-  - name: apply storage class
-    shell: kubectl apply -f files/gcp_pd_sc.fast.yaml
