@@ -1,0 +1,51 @@
+- hosts: master
+  gather_facts: no
+  become: yes
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+  - name: Kubeadm reset
+    tags: "reset"
+    shell: kubeadm reset -f
+  - name: copy kubeadm-config
+    copy:
+      src: kubeadm.config
+      dest: /tmp/
+  - name: Kubeadm init
+    tags: "init"
+    shell: kubeadm init --upload-certs --config /tmp/kubeadm.config
+  - name: Install CNI
+    tags: "init"
+    shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+    #shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  - name: Fetching admin.conf
+    tags: kubeadm_init
+    fetch:
+      src: /etc/kubernetes/admin.conf
+      dest: ~/.kube/config
+      flat: yes
+- hosts: all
+  gather_facts: no
+  become: yes
+  tags: "cloud-config"
+  tasks:
+  - name: Copy cloud-config
+    copy:
+      src: cloud-config
+      dest: /etc/kubernetes/
+- hosts: worker
+  gather_facts: no
+  become: yes
+  tags: "join"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+  - name: Generate join token
+    shell: kubeadm token create --print-join-command
+    register: join_command
+    delegate_to: "{{ groups['master'][0] }}"
+  - set_fact:
+      kubeadm_join: "{{ join_command.stdout }}"
+  - name: Run kubeadm join
+    shell: "{{ kubeadm_join }}" 
+

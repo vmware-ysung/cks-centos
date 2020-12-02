@@ -1,0 +1,3 @@
+[Global]
+project-id = "vmware-ysung"
+node-tags = kubernetes
