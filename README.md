@@ -5,6 +5,7 @@ Prerequsites:
 1. terraform 
 2. ansible
 3. git
+4. google cloud dns (publilc_zone)
 
 Installation steps:
 1. git clone this repo
@@ -17,9 +18,4 @@ Installation steps:
 Destory steps:
 1. terraform destroy --auto-approve
 
-Note1: kubeadm will create global routes on your vpc and terraform doesn't pickup the gcp network routes. This causes an error when destory vpc (those routes depends on the vpc).
-
-Note2: the firewalld rule depends on gcp subnet cidr. Currently it is hard coded in ansible playbook. I am considering a better way to handle this (sending terraform variable to ansible playbook).
-
-
-
+Note1: the firewalld rule depends on gcp subnet cidr. Currently it is hard coded in ansible playbook. I am considering a better way to handle this (sending terraform variable to ansible playbook).
