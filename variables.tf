@@ -23,6 +23,11 @@ variable "instance_type" {
   default = "n2-standard-2"
 }
 
+variable "my_ip" {
+  type = string
+  default ="104.185.159.235/32"
+}
+
 variable "ssh_user" {
   type = string
   default = "ysung"

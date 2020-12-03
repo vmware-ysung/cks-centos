@@ -1,0 +1,12 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - name: Ensure the fqdn name of api
+    lineinfile:
+      path: ~/.kube/config
+      regexp: '\s\s\s\sserver: https:\/\/10\.240\.0\.11:6443'
+      line: '    server: https://cks.phartdoctor.us:6443'
+  - name: Apply storage class
+    shell: "kubectl apply -f deployments/gcp_pd_sc_fast.yaml"
+  - name: Test nginx deployment
+    shell: "kubectl apply -f deployments/nginx-deployment.yaml"

@@ -50,7 +50,7 @@ resource "google_compute_firewall" "cks_allow_external" {
 	  protocol = "tcp"
 	  ports = [22,6443]
 	}
-	source_ranges = ["0.0.0.0/0"]
+	source_ranges = [var.my_ip]
 }
 
 resource "google_compute_address" "lb_ext_ip" {
