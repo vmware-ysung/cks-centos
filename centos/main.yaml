@@ -61,11 +61,12 @@
   become: yes
   tasks:
   - name: firewall ports control plane
-    firewalld:
+    ansible.posix.firewalld:
       port: "{{ item }}"
       permanent: true
       state: enabled
       zone: public
+      immediate: yes
     with_items:
       - 6443/tcp
       - 2379/tcp
@@ -74,11 +75,12 @@
       - 10251/tcp
       - 10252/tcp
   - name: firewall ports worker 
-    firewalld:
+    ansible.posix.firewalld:
       rich_rule: "{{ item }}"
       permanent: true
       state: enabled
       zone: public
+      immediate: yes
     with_items:
       - 'rule family=ipv4 source address=10.240.0.0/24 accept'
       - 'rule family=ipv4 source address=172.17.0.0/16 accept'
@@ -87,11 +89,12 @@
   become: yes
   tasks:
   - name: firewall ports data plane
-    firewalld:
+    ansible.posix.firewalld:
       port: "{{ item }}"
       permanent: true
       state: enabled
       zone: public
+      immediate: yes
     with_items:
       - 10250/tcp
       - 30000-32767/tcp
