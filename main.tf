@@ -173,7 +173,7 @@ resource "null_resource" "ansible_playbook_kubectl" {
   null_resource.ansible_playbook_kubeadm,
   ]
   provisioner "local-exec" {
-    command = "ansible-playbook kuubectl/main.yaml"
+    command = "ansible-playbook kubectl/main.yaml"
   }
 }
 
