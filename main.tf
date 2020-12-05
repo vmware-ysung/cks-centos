@@ -15,7 +15,7 @@ resource "google_compute_network" "cks_network" {
 	auto_create_subnetworks = false
   provisioner "local-exec" {
     when  = destroy
-    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet"
+    command = "gcloud compute routes list --filter=\"name~'dev-cluster*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet"
   }
 }
 
@@ -38,6 +38,7 @@ resource "google_compute_firewall" "cks_allow_internal" {
 	  protocol = "icmp"
 	}
 	source_ranges = [var.subnet_cidr,var.k8s_pod_cidr]
+  target_tags = ["kubernetes"]
 }
 
 resource "google_compute_firewall" "cks_allow_external" {
@@ -49,6 +50,18 @@ resource "google_compute_firewall" "cks_allow_external" {
 	allow {
 	  protocol = "tcp"
 	  ports = [22,6443]
+	}
+  #source_ranges = ["0.0.0.0/0"]
+	source_ranges = [var.my_ip]
+  target_tags = ["kubernetes"]
+}
+
+resource "google_compute_firewall" "cks_allow_nodeports_external" {
+	name = "cks-allow-nodeports"
+        network = google_compute_network.cks_network.name
+	allow {
+		protocol = "tcp"
+		ports = ["30000-32767"]
 	}
 	source_ranges = [var.my_ip]
 }
@@ -88,7 +101,7 @@ resource "google_compute_instance" "cks-master" {
   can_ip_forward	= true
   tags		= ["kubernetes", "k8s", "controller"]
   service_account {
-    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+    scopes = ["compute-rw","storage-full","cloud-platform", "service-management","service-control","logging-write","monitoring"]
   }
 }
 
@@ -116,7 +129,7 @@ resource "google_compute_instance" "cks-workers" {
   can_ip_forward	= true
   tags		= ["kubernetes", "k8s", "worker"]
   service_account {
-    scopes = ["compute-rw","storage-ro","service-management","service-control","logging-write","monitoring"]
+    scopes = ["compute-rw","storage-full","cloud-platform", "service-management","service-control","logging-write","monitoring"]
   } 
 }
 
@@ -135,7 +148,6 @@ resource "local_file" "kubeadm_config" {
     {
       k8s_version = var.k8s_version
       k8s_pod_cidr = var.k8s_pod_cidr
-      k8s_service_dns = var.k8s_service_dns
     }
   )
   filename = "${path.module}/kubeadm/kubeadm.config"
@@ -176,4 +188,3 @@ resource "null_resource" "ansible_playbook_kubectl" {
     command = "ansible-playbook kubectl/main.yaml"
   }
 }
-

@@ -14,8 +14,15 @@ spec:
       labels:
         app: nginx
     spec:
+      volumes:
+        - name: nginx-pvc
+          persistentVolumeClaim:
+            claimName: pvc-demo
       containers:
       - name: nginx
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+        volumeMounts:
+          - mountPath: "/var/log/"
+            name: nginx-pvc

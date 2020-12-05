@@ -65,7 +65,7 @@ variable "subnet_cidr" {
 
 variable "k8s_pod_cidr" {
   type          = string
-  default       = "10.200.0.0/16"
+  default       = "10.244.0.0/16"
 }
 
 variable "k8s_service_cidr" {
