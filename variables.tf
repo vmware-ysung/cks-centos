@@ -1,6 +1,5 @@
 variable "gcp_project" {
 	type = string
-	default = "vmware-ysung"
 }
 
 variable "gcp_region" {
@@ -15,7 +14,6 @@ variable "gcp_zone" {
 
 variable "gcp_credentials" {
 	type = string
-	default = "~/.ssh/vmware-ysung.json"
 }
 
 variable "instance_type" {
@@ -25,17 +23,20 @@ variable "instance_type" {
 
 variable "my_ip" {
   type = string
-  default ="104.185.159.235/32"
 }
 
 variable "ssh_user" {
   type = string
-  default = "ysung"
 }
 
 variable "ssh_pub" {
   type = string
   default = "~/.ssh/id_rsa.pub"
+}
+
+variable "master_count" {
+  type = number
+  default = "1"
 }
 
 variable "worker_count" {
@@ -50,22 +51,28 @@ variable "k8s_version" {
 
 variable "k8s_cloud_dns_zone" {
   type = string
-  default = "ysung-public"
 }
-
-variable "k8s_service_dns" {
+variable "k8s_cloud_dns_fqdn" {
   type = string
-  default = "phartdoctor.us"
+}
+variable "gcp_public_dns_zone" {
+  type = string
+}
+variable "gcp_public_dns_fqdn"{
+  type = string
+}
+variable "k8s_cloud_dns_name" {
+  type = string
 }
 
-variable "subnet_cidr" {
+variable "vpc_subnet_cidr" {
   type          = string
   default       = "10.240.0.0/24"
 }
 
 variable "k8s_pod_cidr" {
   type          = string
-  default       = "10.200.0.0/16"
+  default       = "10.244.0.0/16"
 }
 
 variable "k8s_service_cidr" {

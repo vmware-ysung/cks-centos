@@ -5,7 +5,7 @@ metadata:
   labels:
     app: nginx
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: nginx
@@ -14,8 +14,15 @@ spec:
       labels:
         app: nginx
     spec:
+      volumes:
+        - name: test-pv-storage
+          persistentVolumeClaim:
+            claimName: pvc-demo-fast
       containers:
       - name: nginx
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+        volumeMounts:
+          - mountPath: "/data1"
+            name: test-pv-storage

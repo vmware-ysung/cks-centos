@@ -1,23 +1,3 @@
-- hosts: master
-  gather_facts: no
-  become: yes
-  environment:
-    KUBECONFIG: /etc/kubernetes/admin.conf
-  tasks:
-  - name: Kubeadm reset
-    tags: reset
-    shell: kubeadm reset -f
-  - name: copy kubeadm-config
-    copy:
-      src: kubeadm.config
-      dest: /tmp/
-  - name: Kubeadm init
-    tags: "init"
-    shell: kubeadm init --upload-certs --config /tmp/kubeadm.config
-  - name: Install CNI
-    tags: "init"
-    shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-    #shell: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 - hosts: all
   gather_facts: no
   become: yes
@@ -26,7 +6,20 @@
   - name: Copy cloud-config
     copy:
       src: cloud-config
-      dest: /etc/kubernetes/
+      dest: /etc/kubernetes/cloud-config
+- hosts: master
+  gather_facts: no
+  become: yes
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+  - name: copy kubeadm-config
+    copy:
+      src: kubeadm.config
+      dest: /tmp/
+  - name: Kubeadm init
+    tags: "init"
+    shell: "kubeadm init --upload-certs --config /tmp/kubeadm.config"
 - hosts: worker
   gather_facts: no
   become: yes
@@ -42,15 +35,30 @@
       kubeadm_join: "{{ join_command.stdout }}"
   - name: Run kubeadm join
     shell: "{{ kubeadm_join }}" 
+- hosts: all
+  gather_facts: no
+  become: yes
+  tags: kubelet-extra
+  tasks:
+  - name: Copy kubelet-extra
+    copy:
+      src: kubelet
+      dest: /etc/default/kubelet
+  - name: restart kubelet
+    systemd:
+      name: kubelet
+      state: restarted
+      daemon_reload: yes
 - hosts: master
   gather_facts: no
   become: yes
-  tags: kubeconfig
+  tags: cni
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
   tasks:
+  - name: Install CNI
+    shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
   - name: Fetching admin.conf
-    tags: 
-      - kubeadm_init
-      - kubectl_fetch
     fetch:
       src: /etc/kubernetes/admin.conf
       dest: ~/.kube/config

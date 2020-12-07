@@ -21,6 +21,7 @@
     with_items:
       - net.bridge.bridge-nf-call-ip6tables
       - net.bridge.bridge-nf-call-iptables
+      - net.ipv4.ip_forward
   - name: Swap off
     shell: "swapoff -a"
   - name: Setup docker yum repo
@@ -39,7 +40,7 @@
       baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
       enabled: yes
   - name: Install kubernetes
-    dnf:
+    yum:
       name:
         - kubelet
         - kubeadm
@@ -97,7 +98,6 @@
       immediate: yes
     with_items:
       - 10250/tcp
-      - 30000-32767/tcp
-
+     - 30000-32767/tcp
 
 
