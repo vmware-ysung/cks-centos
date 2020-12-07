@@ -1,6 +1,5 @@
 variable "gcp_project" {
 	type = string
-	default = "vmware-ysung"
 }
 
 variable "gcp_region" {
@@ -15,22 +14,19 @@ variable "gcp_zone" {
 
 variable "gcp_credentials" {
 	type = string
-	default = "~/.ssh/vmware-ysung.json"
 }
 
 variable "instance_type" {
   type = string
-  default = "e2-standard-2"
+  default = "n2-standard-2"
 }
 
 variable "my_ip" {
   type = string
-  default ="104.185.159.235/32"
 }
 
 variable "ssh_user" {
   type = string
-  default = "ysung"
 }
 
 variable "ssh_pub" {
@@ -55,23 +51,18 @@ variable "k8s_version" {
 
 variable "k8s_cloud_dns_zone" {
   type = string
-  default = "ysung-private"
 }
 variable "k8s_cloud_dns_fqdn" {
   type = string
-  default = "cks.vmware.lab."
 }
 variable "gcp_public_dns_zone" {
   type = string
-  default = "ysung-public"
 }
 variable "gcp_public_dns_fqdn"{
   type = string
-  default = "phartdoctor.us."
 }
 variable "k8s_cloud_dns_name" {
   type = string
-  default = "cks.vmware.lab"
 }
 
 variable "vpc_subnet_cidr" {

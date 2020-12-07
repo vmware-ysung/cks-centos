@@ -24,12 +24,6 @@
       - net.ipv4.ip_forward
   - name: Swap off
     shell: "swapoff -a"
-  - name: Stop firewalld
-    systemd:
-      name: firewalld
-      enabled: no
-      state: stopped
-      daemon_reload: yes
   - name: Setup docker yum repo
     yum_repository:
       name: docker
@@ -63,47 +57,47 @@
       name: kubelet
       enabled: yes
       state: started
-# - hosts: master
-#   gather_facts: no
-#   become: yes
-#   tasks:
-#   - name: firewall ports control plane
-#     ansible.posix.firewalld:
-#       port: "{{ item }}"
-#       permanent: true
-#       state: enabled
-#       zone: public
-#       immediate: yes
-#     with_items:
-#       - 6443/tcp
-#       - 2379/tcp
-#       - 2380/tcp
-#       - 10250/tcp
-#       - 10251/tcp
-#       - 10252/tcp
-#   - name: firewall ports worker 
-#     ansible.posix.firewalld:
-#       rich_rule: "{{ item }}"
-#       permanent: true
-#       state: enabled
-#       zone: public
-#       immediate: yes
-#     with_items:
-#       - 'rule family=ipv4 source address=10.240.0.0/24 accept'
-#       - 'rule family=ipv4 source address=172.17.0.0/16 accept'
-# - hosts: worker
-#   gather_facts: no
-#   become: yes
-#   tasks:
-#   - name: firewall ports data plane
-#     ansible.posix.firewalld:
-#       port: "{{ item }}"
-#       permanent: true
-#       state: enabled
-#       zone: public
-#       immediate: yes
-#     with_items:
-#       - 10250/tcp
-#      - 30000-32767/tcp
+- hosts: master
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: firewall ports control plane
+    ansible.posix.firewalld:
+      port: "{{ item }}"
+      permanent: true
+      state: enabled
+      zone: public
+      immediate: yes
+    with_items:
+      - 6443/tcp
+      - 2379/tcp
+      - 2380/tcp
+      - 10250/tcp
+      - 10251/tcp
+      - 10252/tcp
+  - name: firewall ports worker 
+    ansible.posix.firewalld:
+      rich_rule: "{{ item }}"
+      permanent: true
+      state: enabled
+      zone: public
+      immediate: yes
+    with_items:
+      - 'rule family=ipv4 source address=10.240.0.0/24 accept'
+      - 'rule family=ipv4 source address=172.17.0.0/16 accept'
+- hosts: worker
+  gather_facts: no
+  become: yes
+  tasks:
+  - name: firewall ports data plane
+    ansible.posix.firewalld:
+      port: "{{ item }}"
+      permanent: true
+      state: enabled
+      zone: public
+      immediate: yes
+    with_items:
+      - 10250/tcp
+     - 30000-32767/tcp
 
 
