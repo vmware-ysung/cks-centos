@@ -24,9 +24,3 @@
     shell: "kubectl apply -f deployments/pvc_test.yaml"
   - name: Test nginx deployment
     shell: "kubectl apply -f deployments/nginx-deployment.yaml"
-  - name: Apply Cert-Manager
-    shell: "kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
-  - name: Show all
-    shell: "kubectl get all -A"
-  - name: Test Cert-Manager
-    shell: "kubectl apply -f deployments/test-resource_cert-manager.yaml"

@@ -9,15 +9,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: pvc-demo-slow
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: slow
-  resources:
-    requests:
-      storage: 5Gi
+  volumeMode: Filesystem

@@ -20,7 +20,7 @@ variable "gcp_credentials" {
 
 variable "instance_type" {
   type = string
-  default = "n2-standard-2"
+  default = "e2-standard-2"
 }
 
 variable "my_ip" {
@@ -38,6 +38,11 @@ variable "ssh_pub" {
   default = "~/.ssh/id_rsa.pub"
 }
 
+variable "master_count" {
+  type = number
+  default = "1"
+}
+
 variable "worker_count" {
   type          = number
   default       = 3
@@ -50,15 +55,26 @@ variable "k8s_version" {
 
 variable "k8s_cloud_dns_zone" {
   type = string
+  default = "ysung-private"
+}
+variable "k8s_cloud_dns_fqdn" {
+  type = string
+  default = "cks.vmware.lab."
+}
+variable "gcp_public_dns_zone" {
+  type = string
   default = "ysung-public"
 }
-
-variable "k8s_service_dns" {
+variable "gcp_public_dns_fqdn"{
   type = string
-  default = "phartdoctor.us"
+  default = "phartdoctor.us."
+}
+variable "k8s_cloud_dns_name" {
+  type = string
+  default = "cks.vmware.lab"
 }
 
-variable "subnet_cidr" {
+variable "vpc_subnet_cidr" {
   type          = string
   default       = "10.240.0.0/24"
 }

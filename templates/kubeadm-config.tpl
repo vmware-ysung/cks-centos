@@ -2,14 +2,15 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 nodeRegistration:
   kubeletExtraArgs:
+    feature-gates: "EphemeralContainers=true"
     cloud-provider: gce
     cloud-config: /etc/kubernetes/cloud-config
-    feature-gates: "EphemeralContainers=true"
 ---
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: ${k8s_version}
-clusterName: kubernetes
+api:
+  advertiseAddress: ${api_public_ip}
 cloud-provider: gce
 networking:
   podSubnet: ${k8s_pod_cidr} 
@@ -20,12 +21,14 @@ apiServer:
     cloud-provider: gce
     cloud-config: /etc/kubernetes/cloud-config
   extraVolumes:
-  - name: cloud-config
+  - name: cloud
     hostPath: /etc/kubernetes/cloud-config
     mountPath: /etc/kubernetes/cloud-config
-    pathType: FileOrCreate
   certSANs:
-  - cks-master1.c.vmware-ysung.internal
+  - "*.c.vmware-ysung.internal"
+  - "*.${k8s_cloud_dns}"
+  - "${k8s_master_ip}"
+  - "cks.phartdoctor.us"
 scheduler:
   extraArgs:
     feature-gates: "EphemeralContainers=true"
@@ -35,7 +38,6 @@ controllerManager:
     cloud-provider: gce
     cloud-config: /etc/kubernetes/cloud-config
   extraVolumes:
-  - name: cloud-config
+  - name: cloud
     hostPath: /etc/kubernetes/cloud-config
     mountPath: /etc/kubernetes/cloud-config
-    pathType: FileOrCreate
