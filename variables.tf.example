@@ -1,5 +1,5 @@
 variable "gcp_project" {
-	type = string
+  type = string
 }
 
 variable "gcp_region" {
@@ -13,7 +13,7 @@ variable "gcp_zone" {
 }
 
 variable "gcp_credentials" {
-	type = string
+  type = string
 }
 
 variable "instance_type" {
@@ -45,23 +45,24 @@ variable "worker_count" {
 }
 
 variable "k8s_version" {
-  type		= string
-  default	= "1.19.4"
+  type    = string
+  default = "1.19.4"
 }
 
 variable "k8s_cloud_dns_zone" {
   type = string
 }
-variable "k8s_cloud_dns_fqdn" {
+variable "k8s_cloud_dns_name" {
   type = string
 }
+variable "k8s_private_dns" {
+  type = string
+}
+
 variable "gcp_public_dns_zone" {
   type = string
 }
 variable "gcp_public_dns_fqdn"{
-  type = string
-}
-variable "k8s_cloud_dns_name" {
   type = string
 }
 
@@ -76,6 +77,6 @@ variable "k8s_pod_cidr" {
 }
 
 variable "k8s_service_cidr" {
-  type		= string
-  default	= "10.96.0.0/12"
+  type    = string
+  default = "10.96.0.0/12"
 }
