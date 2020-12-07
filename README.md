@@ -9,11 +9,13 @@ Prerequsites:
 
 Installation steps:
 1. git clone this repo
-2. review and modify the variable.tf (gcp_project, gcp_region, gcp_credentials, my_ip, ssh_user, and ssh_pub_key)
-3. terraform init
-4. terraform plan
-5. terraform apply --auto-approve
-6. ssh to the master and kubectl away
+2. cp variables.tf.example variables.tf 
+3. review and modify the variable.tf (gcp_project, gcp_region, gcp_credentials, my_ip, ssh_user, and ssh_pub_key)
+4. terraform init
+5. terraform plan
+6. terraform apply --auto-approve
+7. check your ~/.kube/config
+8. kubectl cluster-info
 
 Destory steps:
 1. terraform destroy --auto-approve

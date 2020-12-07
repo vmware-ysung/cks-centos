@@ -25,11 +25,11 @@
       - net.ipv4.ip_forward
   - name: Swap off
     shell: "swapoff -a"
-  # - name: Disable swap in fstab
-  #   replace:
-  #     path: /etc/fstab
-  #     regexp: '^([^#].**?\sswap\s+sw\s+.*)$'
-  #     replace: '# \1'
+  - name: Disable swap in fstab
+    mount:
+      name: swap
+      fstype: swap
+      state: absent
   - name: Setup dep key
     apt_key:
       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
