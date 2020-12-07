@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny
+  namespace: test
+spec:
+  podSelector:
+    matchLabels:
+      color: red
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          color: black
+    ports:
+    - port: 80
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          color: red
+    ports:
+    - port: 80
