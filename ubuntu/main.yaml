@@ -21,9 +21,15 @@
     with_items:
       - net.bridge.bridge-nf-call-ip6tables
       - net.bridge.bridge-nf-call-iptables
+      - net.bridge.bridge-nf-call-arptables
       - net.ipv4.ip_forward
   - name: Swap off
     shell: "swapoff -a"
+  # - name: Disable swap in fstab
+  #   replace:
+  #     path: /etc/fstab
+  #     regexp: '^([^#].**?\sswap\s+sw\s+.*)$'
+  #     replace: '# \1'
   - name: Setup dep key
     apt_key:
       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
@@ -45,10 +51,11 @@
       - libseccomp2
       - apt-transport-https
       - curl
+      - ethtool
       - kubelet
       - kubeadm
       - kubectl
-      - docker.io
+      - containerd
   - name: hold kubeadm
     dpkg_selections:
       name: "{{ item }}"
@@ -59,6 +66,6 @@
       - kubectl  
   - name: Start docker service 
     systemd:
-      name: docker
+      name: containerd
       state: started
       enabled: yes

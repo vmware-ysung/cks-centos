@@ -80,7 +80,7 @@ data "google_dns_managed_zone" "cks_public_zone" {
 }
 
 resource "google_dns_record_set" "cks_masters_external" {
-  name = "cks.${var.gcp_public_dns_fqdn}"
+  name = var.gcp_public_dns_fqdn
   type = "A"
   ttl = 300
   managed_zone = data.google_dns_managed_zone.cks_public_zone.name
@@ -90,7 +90,7 @@ resource "google_dns_record_set" "cks_masters_external" {
 
 resource "google_dns_managed_zone" "cks_private_zone" {
   name = var.k8s_cloud_dns_zone
-  dns_name = var.k8s_cloud_dns_fqdn
+  dns_name = var.k8s_cloud_dns_name
   description = "My Lab Zone"
   visibility = "private"
   private_visibility_config {
@@ -134,7 +134,7 @@ resource "google_compute_instance" "cks-masters" {
   count   = var.master_count
   name		= "cks-master${count.index+1}"
   machine_type	= var.instance_type
-  hostname = "cks-master${count.index+1}.${var.k8s_cloud_dns_name}"
+  hostname = "cks-master${count.index+1}.${var.k8s_private_dns}"
   metadata	= {
     ssh-keys = "ysung: ${file("~/.ssh/id_rsa.pub")}"
   }
@@ -163,7 +163,7 @@ resource "google_compute_instance" "cks-workers" {
   count		= var.worker_count
   name		= "cks-worker${count.index+1}"
   machine_type	= var.instance_type
-  hostname = "cks-worker${count.index+1}.${var.k8s_cloud_dns_name}"
+  hostname = "cks-worker${count.index+1}.${var.k8s_private_dns}"
   metadata	= {
     ssh-keys = "ysung: ${file("~/.ssh/id_rsa.pub")}"
     pod-cidr	= cidrsubnet(var.k8s_pod_cidr,8,count.index+101)
@@ -190,7 +190,7 @@ resource "google_compute_instance" "cks-workers" {
 
 resource "google_dns_record_set" "cks_masters" {
   count = var.master_count
-  name = "cks-master${count.index+1}.${var.k8s_cloud_dns_fqdn}"
+  name = "cks-master${count.index+1}.${var.k8s_cloud_dns_name}"
   type = "A"
   ttl = 300
   managed_zone = google_dns_managed_zone.cks_private_zone.name
@@ -199,7 +199,7 @@ resource "google_dns_record_set" "cks_masters" {
 
 resource "google_dns_record_set" "cks_workers" {
   count = var.worker_count
-  name = "cks-worker${count.index+1}.${var.k8s_cloud_dns_fqdn}"
+  name = "cks-worker${count.index+1}.${var.k8s_cloud_dns_name}"
   type = "A"
   ttl = 300
   managed_zone = google_dns_managed_zone.cks_private_zone.name
@@ -221,8 +221,7 @@ resource "local_file" "kubeadm_config" {
     {
       k8s_version = var.k8s_version
       k8s_pod_cidr = var.k8s_pod_cidr
-      k8s_cloud_dns = var.k8s_cloud_dns_name
-      k8s_master_ip = google_compute_instance.cks-masters[0].network_interface.0.access_config.0.nat_ip
+      k8s_private_dns_name = var.k8s_private_dns
       api_public_ip = google_compute_address.lb_ext_ip.address
     }
   )
@@ -257,7 +256,6 @@ resource "null_resource" "ansible_playbook_kubeadm" {
     command = "ansible-playbook kubeadm/main.yaml"
   }
 }
-/*
 resource "null_resource" "ansible_playbook_kubectl" {
   depends_on = [
   null_resource.ansible_playbook_kubeadm,
@@ -266,5 +264,4 @@ resource "null_resource" "ansible_playbook_kubectl" {
     command = "ansible-playbook kubectl/main.yaml"
   }
 }
-*/
 

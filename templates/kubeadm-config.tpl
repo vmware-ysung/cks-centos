@@ -26,8 +26,8 @@ apiServer:
     mountPath: /etc/kubernetes/cloud-config
   certSANs:
   - "*.c.vmware-ysung.internal"
-  - "*.${k8s_cloud_dns}"
-  - "${k8s_master_ip}"
+  - "*.${k8s_private_dns_name}"
+  - "${api_public_ip}"
   - "cks.phartdoctor.us"
 scheduler:
   extraArgs:
