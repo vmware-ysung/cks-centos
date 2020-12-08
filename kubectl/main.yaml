@@ -24,3 +24,9 @@
     shell: "kubectl apply -f deployments/pvc_test.yaml"
   - name: Test nginx deployment
     shell: "kubectl apply -f deployments/nginx-deployment.yaml"
+  - name: Add cert-manager
+    tags: cert-manager
+    shell: "kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
+  - name: Add gcc secret
+    tags: gcrsecret
+    shell: kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"
