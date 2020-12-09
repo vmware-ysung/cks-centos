@@ -4,9 +4,11 @@ provider "google" {
 	region = var.gcp_profile.region
 	zone = var.gcp_profile.zone
 }
+
 data "google_dns_managed_zone" "cks_public_zone" {
   name = var.gcp_public_dns_zone
 }
+
 data "external" "myipaddr" {
   program = ["sh", "-c", "curl -s 'https://api.ipify.org?format=json'"]
 }
@@ -14,6 +16,7 @@ data "external" "myipaddr" {
 resource "google_compute_address" "lb_ext_ip" {
   name  = "lb-ext-ip"
 }
+
 resource "google_compute_network" "cks_network" {
 	name = "cks-vpc"
 	auto_create_subnetworks = false
@@ -22,9 +25,10 @@ resource "google_compute_network" "cks_network" {
     command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet"
   }
 }
+
 resource "google_dns_managed_zone" "cks_private_zone" {
-  name = var.gcp_private_dns_zone
-  dns_name = var.k8s_cloud_dns_name
+  name = var.gcp_private_dns_zone.zone_name
+  dns_name = var.gcp_private_dns_zone.dns_name
   visibility = "private"
   private_visibility_config {
     networks {
@@ -32,6 +36,7 @@ resource "google_dns_managed_zone" "cks_private_zone" {
     }
   }
 }
+
 resource "google_compute_subnetwork" "cks_subnet" {
 	name = "cks-subnet"
 	ip_cidr_range = var.vpc_subnet_cidr
@@ -91,13 +96,14 @@ resource "google_dns_record_set" "cks_masters_external" {
   managed_zone = data.google_dns_managed_zone.cks_public_zone.name
   rrdatas = [google_compute_address.lb_ext_ip.address]
 }
+
 resource "google_compute_instance" "cks-masters" {
   count   = var.master_count
   name		= "cks-master${count.index+1}"
   machine_type	= var.gce_vm.instance_type
-  hostname = "cks-master${count.index+1}.${trimsuffix(var.k8s_cloud_dns_name, ".")}"
+  hostname = "cks-master${count.index+1}.${trimsuffix(var.gcp_private_dns_zone.dns_name, ".")}"
   metadata	= {
-    ssh-keys = "${var.ssh_user}: ${file(var.ssh_pub)}"
+    ssh-keys = "${var.gce_vm.ssh_user}: ${file(var.gce_vm.ssh_pub)}"
   }
   boot_disk {
     auto_delete		= true
@@ -119,13 +125,14 @@ resource "google_compute_instance" "cks-masters" {
     scopes = ["compute-rw","storage-full","cloud-platform", "service-management","service-control","logging-write","monitoring"]
   }
 }
+
 resource "google_compute_instance" "cks-workers" {
   count		= var.worker_count
   name		= "cks-worker${count.index+1}"
   machine_type	= var.gce_vm.instance_type
-  hostname = "cks-worker${count.index+1}.${trimsuffix(var.k8s_cloud_dns_name, ".")}"
+  hostname = "cks-worker${count.index+1}.${trimsuffix(var.gcp_private_dns_zone.dns_name, ".")}"
   metadata	= {
-    ssh-keys = "${var.ssh_user}: ${file(var.ssh_pub)}"
+    ssh-keys = "${var.gce_vm.ssh_user}: ${file(var.gce_vm.ssh_pub)}"
     pod-cidr	= cidrsubnet(var.k8s_pod_cidr,8,count.index+101)
   }
   boot_disk {
@@ -181,7 +188,7 @@ resource "local_file" "kubeadm_config" {
     {
       k8s_version = var.k8s_version
       k8s_pod_cidr = var.k8s_pod_cidr
-      k8s_private_dns_name = trimsuffix(var.k8s_cloud_dns_name,".")
+      k8s_private_dns_name = trimsuffix(var.gcp_private_dns_zone.dns_name,".")
       k8s_public_dns_name = trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".")
       api_public_ip = google_compute_address.lb_ext_ip.address
     }
@@ -203,7 +210,7 @@ resource "null_resource" "ansible_playbook_os" {
 	local_file.ansible_host,
   ]
   provisioner "local-exec" {
-    command = "ansible-playbook ubuntu/main.yaml --extra-vars='k8s_ver=${var.k8s_version}'"
+    command = "ansible-playbook os/main.yaml --extra-vars='k8s_ver=${var.k8s_version}'"
   }
 }
 
