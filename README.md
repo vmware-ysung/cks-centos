@@ -1,7 +1,8 @@
-# cks-centos
+# Certified Kubernetes Security Specialist Stuffs
+---
 My terraform, ansible, and kubeadm scripts for CKS exam (K8S v1.20.0)
 
-Prerequsites (Mac):
+##Prerequsites (Mac):
 - terraform (brew install terraform)
 - ansible (brew install ansible)
 - git (brew install git)
@@ -127,6 +128,6 @@ cks-centos %terraform destroy --auto-approve
 ```
 
 ##ToDo:
-1. instance group
-2. kubeadm upgrade
-3. controlplane ha
+- [] Instance groups
+- [] Kubeadm upgrade
+- [] Controlplane ha
