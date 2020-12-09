@@ -30,7 +30,7 @@ variable "gcp_profile" {
     project = "XXXXXXX"                  <== Your GCP Project
     region = "us-central1"               <== Your Preferred GCP Region
     zone = "us-central1-c"               <== Your Preferred GCP Zone
-    credentials = "~/.ssh/XXXXXXX.json"  <== Your GCP Service Account Credential (https://cloud.google.com/iam/docs/creating-managing-service-account-keys)
+    credentials = "~/.ssh/XXXXXXX.json"  <== Your GCP Service Account Credential
   }
   sensitive = true
 }
