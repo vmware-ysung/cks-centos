@@ -130,4 +130,4 @@ cks-centos %terraform destroy --auto-approve
 ## ToDo:
 - [] Instance groups
 - [] Kubeadm upgrade
-- [] Controlplane ha
+- [] Control plane HA
