@@ -16,8 +16,8 @@
   - name: Ensure the fqdn name of api
     lineinfile:
       path: ~/.kube/config
-      regexp: '\s\s\s\sserver: https:\/\/10\.240\.0\.11:6443'
-      line: '    server: https://cks.phartdoctor.us:6443'
+      regexp: '\s\s\s\sserver: https://{{ k8s_private_ip }}:6443'
+      line: '    server: https://{{ k8s_public_ip }}:6443'
   - name: Apply storage class
     shell: "kubectl apply -f deployments/gcp_pd_sc.yaml"
   - name: Apply dynamic pvc
@@ -30,3 +30,6 @@
   - name: Add gcc secret
     tags: gcrsecret
     shell: kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"
+  # - name: K8S dashboard UI
+  #   shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
+

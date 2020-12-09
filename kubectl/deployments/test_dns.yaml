@@ -2,7 +2,9 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: dnsutils
-  namespace: default
+  namespace: test
+  labels:
+    run: dns
 spec:
   containers:
   - name: dnsutils

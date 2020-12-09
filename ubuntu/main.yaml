@@ -52,9 +52,9 @@
       - apt-transport-https
       - curl
       - ethtool
-      - kubelet
-      - kubeadm
-      - kubectl
+      - kubelet={{ k8s_ver }}-00
+      - kubeadm={{ k8s_ver }}-00
+      - kubectl={{ k8s_ver }}-00
       - containerd
   - name: hold kubeadm
     dpkg_selections:
@@ -64,7 +64,7 @@
       - kubelet
       - kubeadm
       - kubectl  
-  - name: Start docker service 
+  - name: Start containerd service 
     systemd:
       name: containerd
       state: started

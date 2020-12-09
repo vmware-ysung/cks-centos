@@ -9,9 +9,6 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: ${k8s_version}
-api:
-  advertiseAddress: ${api_public_ip}
-cloud-provider: gce
 networking:
   podSubnet: ${k8s_pod_cidr} 
 apiServer:
@@ -25,10 +22,9 @@ apiServer:
     hostPath: /etc/kubernetes/cloud-config
     mountPath: /etc/kubernetes/cloud-config
   certSANs:
-  - "*.c.vmware-ysung.internal"
   - "*.${k8s_private_dns_name}"
   - "${api_public_ip}"
-  - "cks.phartdoctor.us"
+  - "${k8s_public_dns_name}"
 scheduler:
   extraArgs:
     feature-gates: "EphemeralContainers=true"
