@@ -9,11 +9,11 @@ Prerequsites (Mac):
 
 Installation steps:
 1. git clone this repo
-'''
+```
 git%git clone https://github.com/vmware-ysung/cks-centos.git
 git%cd cks-centos
 cks-centos% 
-'''
+```
 2. cp variables.tf.example variables.tf
 3. review and modify the variable.tf
 4. terraform init
