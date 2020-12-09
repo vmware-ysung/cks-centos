@@ -3,7 +3,7 @@ My terraform, ansible, and kubeadm scripts for CKS exam (K8S v1.20.0)
 
 Prerequsites (Mac):
 - terraform 
--  ansible
+- ansible
 - git
 - Google cloud managed dns (publilc_zone)
 
