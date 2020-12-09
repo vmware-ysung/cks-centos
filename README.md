@@ -27,10 +27,10 @@ variable "gcp_profile" {
   description = "GCP Configuration"
   type = map
   default = {
-    project = "XXXXXXX"
-    region = "us-central1"
-    zone = "us-central1-c"
-    credentials = "~/.ssh/XXXXXXX.json"
+    project = "XXXXXXX"                  <== Your GCP Project
+    region = "us-central1"               <== Your Preferred GCP Region
+    zone = "us-central1-c"               <== Your Preferred GCP Zone
+    credentials = "~/.ssh/XXXXXXX.json"  <== Your GCP Service Account Credential (https://cloud.google.com/iam/docs/creating-managing-service-account-keys)
   }
   sensitive = true
 }
@@ -43,8 +43,8 @@ variable "gce_vm" {
     os_project = "ubuntu-os-cloud"
     os_family = "ubuntu-2004-lts"
     boot_disk_size = 200
-    ssh_user = "XXXX"
-    ssh_pub = "~/.ssh/id_rsa.pub"
+    ssh_user = "XXXX"                    <== Your local user_name
+    ssh_pub = "~/.ssh/id_rsa.pub"        <== Your ssh public key
   }
 }
 
@@ -69,15 +69,15 @@ variable "gcp_private_dns_zone" {
   description = "Google Managed DNS zone - private zone name"
   type = map
   default = {
-    zone_name = "XXXXX-private"
-    dns_name = "cks.vmware.lab."
+    zone_name = "XXXXX-private"            <== Your Google Cloud Managed Zone (private)
+    dns_name = "cks.vmware.lab."           <== Your Google Cloud Managed Zone DNS Name (private)
   } 
 }
 
 variable "gcp_public_dns_zone" {
   description = "Google Managed DNS zone - public (preconfig required)"
   type = string
-  default = "xxxxx-public-vmware-zone"
+  default = "xxxxx-public-vmware-zone"     <== OPTIOINAL: Your Google Cloud Managed Zone (public)
 }
 
 variable "vpc_subnet_cidr" {
