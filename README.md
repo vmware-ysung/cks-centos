@@ -10,17 +10,17 @@ My terraform, ansible, and kubeadm scripts for CKS exam (K8S v1.20.0)
 - GCP Project with a Google cloud managed dns (publilc_zone)
 
 ## Installation:
-1. git clone this repo
+1. Clone this repo
 ```
 git %git clone https://github.com/vmware-ysung/cks-centos.git
 git %cd cks-centos
 cks-centos % 
 ```
-2. cp variables.tf.example variables.tf
+2. Prepare variables.tf
 ```
 cks-centos %mv variables.tf.example variables.tf
 ```
-3. review and modify the variable.tf
+3. Review and modify the variables.tf
 ```
 cks-centos % cat variables.tf
 variable "gcp_profile" {
@@ -99,30 +99,30 @@ variable "k8s_service_cidr" {
 }
 
 ```
-4. terraform init
+4. Init Terraform plugins
 ```
 cks-centos %terraform init
 ```
-5. terraform plan
+5. Reivew Terraform plan
 ```
 cks-centos %terraform plan
 ```
-6. terraform apply --auto-approve
+6. Apply Terraform plan
 ```
 cks-centos %terraform apply --auto-approve
 ```
-7. check your ~/.kube/config
+7. Check the k8s cluster
 ```
 cks-centos %kubectl get nodes
 ```
-8. kubectl the security stuffs
+8. Kubectl away...
 ```
 cks-centos %cd kubectl/deployments
 deployments %
 ```
 
-## Destroy:
-1. terraform destroy --auto-approve
+## Reset:
+1. Destroy the terraform plan
 ```
 cks-centos %terraform destroy --auto-approve
 ```
