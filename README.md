@@ -2,14 +2,14 @@
 ---
 My terraform, ansible, and kubeadm scripts for CKS exam (K8S v1.20.0)
 
-##Prerequsites (Mac):
+## Prerequsites (Mac):
 - terraform (brew install terraform)
 - ansible (brew install ansible)
 - git (brew install git)
 - kubectl (brew install kubectl)
 - GCP Project with a Google cloud managed dns (publilc_zone)
 
-##Installation:
+## Installation:
 1. git clone this repo
 ```
 git %git clone https://github.com/vmware-ysung/cks-centos.git
@@ -121,13 +121,13 @@ cks-centos %cd kubectl/deployments
 deployments %
 ```
 
-##Destroy:
+## Destroy:
 1. terraform destroy --auto-approve
 ```
 cks-centos %terraform destroy --auto-approve
 ```
 
-##ToDo:
+## ToDo:
 - [] Instance groups
 - [] Kubeadm upgrade
 - [] Controlplane ha
