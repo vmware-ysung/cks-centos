@@ -1,0 +1,7 @@
+- hosts: master
+  gather_fact: no
+  become: yes
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+  - name: unhold kubeadm

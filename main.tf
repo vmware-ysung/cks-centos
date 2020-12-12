@@ -116,7 +116,6 @@ resource "google_compute_instance" "cks-masters" {
     subnetwork	= google_compute_subnetwork.cks_subnet.self_link
     network_ip	= cidrhost(var.vpc_subnet_cidr, count.index+11)
     access_config {
-      nat_ip = google_compute_address.lb_ext_ip.address
     }
   }
   can_ip_forward	= true
@@ -176,7 +175,7 @@ resource "google_dns_record_set" "cks_workers" {
 resource "local_file" "ansible_host" {
  content = templatefile("templates/hosts.tpl",
 	   {
-		 cks_master = google_compute_instance.cks-masters.*.network_interface.0.access_config.0.nat_ip
+     cks_master = google_compute_instance.cks-masters.*.network_interface.0.access_config.0.nat_ip
 		 cks_worker = google_compute_instance.cks-workers.*.network_interface.0.access_config.0.nat_ip
 	   }
 	)
@@ -205,6 +204,39 @@ resource "local_file" "cloud_config" {
   filename = "${path.module}/kubeadm/cloud-config"
 }
 
+resource "local_file" "keepalived_config" {
+  content = templatefile("templates/keepalived.conf.tpl",
+    {
+      STATE = "BACKUP"
+      INTERFACE = "ens4"
+      ROUTER_ID = 51
+      PRIORITY = 100
+      AUTH_PASS = 42
+      APISERVER_VIP = google_compute_address.lb_ext_ip.address
+    }
+  )
+  filename = "${path.module}/os/files/keepalived.conf"
+}
+resource "local_file" "keepalived_script" {
+  content = templatefile("templates/check_apiserver.sh.tpl",
+    {
+      APISERVER_VIP = google_compute_address.lb_ext_ip.address
+      APISERVER_DEST_PORT = 6443
+    }
+  )
+  filename = "${path.module}/os/files/check_apiserver.sh"
+}
+resource "local_file" "haproxy_cfg" {
+  content = templatefile("templates/haproxy.cfg.tpl",
+    {
+      cks_master = google_compute_instance.cks-masters.*.network_interface.0.network_ip
+      APISERVER_SRC_PORT = 6443
+      APISERVER_DEST_PORT = 6443
+    }
+  )
+  filename = "${path.module}/os/files/haproxy.cfg"
+}
+
 resource "null_resource" "ansible_playbook_os" {
   depends_on = [
 	local_file.ansible_host,
@@ -231,3 +263,5 @@ resource "null_resource" "ansible_playbook_kubectl" {
     command = "ansible-playbook  kubectl/main.yaml --extra-vars='k8s_public_ip=${google_compute_address.lb_ext_ip.address} k8s_private_ip=${google_compute_instance.cks-masters[0].network_interface.0.network_ip}'"
   }
 }
+
+

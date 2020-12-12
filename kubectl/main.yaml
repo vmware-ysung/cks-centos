@@ -1,4 +1,4 @@
-- hosts: master
+- hosts: master-1
   gather_facts: no
   become: yes
   tags: kubeconfig
@@ -32,4 +32,3 @@
     shell: kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"
   # - name: K8S dashboard UI
   #   shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
-
