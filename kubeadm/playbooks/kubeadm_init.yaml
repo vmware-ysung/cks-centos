@@ -1,0 +1,21 @@
+- hosts: master-1
+  gather_facts: no
+  become: yes
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  tasks:
+  - name: copy kubeadm-config
+    copy:
+      src: ../kubeadm.config
+      dest: /tmp/
+  - name: Kubeadm init
+    tags: init
+    run_once: true
+    shell: "kubeadm init --upload-certs --config /tmp/kubeadm.config"
+  - name: Install CNI
+    shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  - name: Fetching admin.conf
+    fetch:
+      src: /etc/kubernetes/admin.conf
+      dest: ~/.kube/config
+      flat: yes

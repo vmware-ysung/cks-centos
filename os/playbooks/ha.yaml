@@ -1,0 +1,38 @@
+- hosts: master
+  gather_facts: yes
+  become: yes
+  tasks:
+  - name: Install HA components
+    apt:
+      pkg:
+      - haproxy
+      - keepalived
+  - name: keepalived user
+    user:
+      name: keepalived_script
+      shell: /usr/sbin/nologin
+      home: /dev/null
+  - name: Copy keepalived files
+    copy:
+      src: "{{ item }}"
+      dest: /etc/keepalived
+      mode: 0755
+      owner: keepalived_script
+      group: keepalived_script
+    with_items:
+      - ../files/keepalived.conf
+      - ../files/check_apiserver.sh
+  - name: Copy haproxy files
+    copy:
+      src: "{{ item }}"
+      dest: /etc/haproxy
+    with_items:
+      - ../files/haproxy.cfg
+  - name: Enable HA
+    systemd:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items:
+      - haproxy
+      - keepalived

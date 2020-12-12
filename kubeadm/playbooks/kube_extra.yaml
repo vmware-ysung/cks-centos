@@ -1,0 +1,14 @@
+- hosts: all
+  gather_facts: no
+  become: yes
+  tags: kubelet-extra
+  tasks:
+  - name: Copy kubelet-extra
+    copy:
+      src: ../kubelet
+      dest: /etc/default/kubelet
+  - name: restart kubelet
+    systemd:
+      name: kubelet
+      state: restarted
+      daemon_reload: yes

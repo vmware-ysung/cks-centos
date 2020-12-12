@@ -1,0 +1,19 @@
+- hosts: master:!master-1
+  gather_facts: no
+  become: yes
+  tags: cp-join
+  tasks:
+  - name: Generate join token
+    shell: kubeadm token create --print-join-command
+    register: join_command
+    delegate_to: master-1
+  - set_fact:
+      kubeadm_join: "{{ join_command.stdout }}"
+  - name: Generate cert-key
+    shell: kubeadm certs certificate-key
+    register: cert_key
+    delegate_to: master-1
+  - set_fact:
+      cert_key: "{{ cert_key.stdout }}"
+  - name: Run kubeadm join --control-plane
+    shell: "{{ kubeadm_join }} --control-plane --certificate-key {{ cert_key }}"

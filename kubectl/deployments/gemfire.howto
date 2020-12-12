@@ -1,0 +1,48 @@
+
+
+
+
+
+%docker login registry.pivotal.io -u <network.pivotal.io_username> -p <network.pivotal.io_password>
+%docker pull registry.pivotal.io/tanzu-gemfire-for-kubernetes/gemfire-controller:1.0.0
+%docker pull registry.pivotal.io/tanzu-gemfire-for-kubernetes/gemfire-k8s:1.0.0
+%docker image ls
+REPOSITORY                                                            TAG                                              IMAGE ID            CREATED             SIZE
+registry.pivotal.io/tanzu-gemfire-for-kubernetes/gemfire-k8s          1.0.0                                            7bb8fb781003        8 days ago          632MB
+registry.pivotal.io/tanzu-gemfire-for-kubernetes/gemfire-controller   1.0.0                                            ec22db0a8ac0        8 days ago          31.5MB
+%docker image ls |grep registry.pivotal.io/tanzu-gemfire-for-kubernetes/gemfire-k8s | awk '{print "Tag:" $2 "\tID:" $3}'
+%gcloud auth congfigure-docker
+%docker tag ec22db0a8ac0 gcr.io/<gcp_project>/tanzu-gemfire-for-kubernetes/gemfire-controller:1.0.0
+%docker push gcr.io/<gcp_project>/tanzu-gemfire-for-kubernetes/gemfire-controller:1.0.0
+%docker tag 7bb8fb781003 gcr.io/<gcp_project>/tanzu-gemfire-for-kubernetes/gemfire-k8s:1.0.0
+%docker push gcr.io/<gcp_project>/tanzu-gemfire-for-kubernetes/gemfire-k8s:1.0.0
+
+%tar zxvf gemfire-operator-1.0.0.tg
+%cd gemfire-operator
+%#modify the repo in value.yaml to your gcr repo
+%kubectl create namespace geode
+%kubectl config set-context --current --namespace= geode
+%helm install gemifire-operator gemfire-operator/
+%helm ls --namespace geode
+NAME              NAMESPACE REVISION  UPDATED                               STATUS    CHART                   APP VERSION
+gemifire-operator geode     1         2020-12-09 19:45:35.021677 -0600 CST  deployed  gemfire-operator-1.0.0
+
+%EXPORT $GCP_PROJECT=xxxxx
+%cat > gemfire1.yaml<<EOF
+apiVersion: gemfire.tanzu.vmware.com/v1
+kind: GemFireCluster
+metadata:
+  name: gemfire1
+  namespace: geode
+spec:
+  image: gcr.io/$GCP_PROJECT/tanzu-gemfire-for-kubernetes/gemfire-k8s:1.0.0
+EOF
+%
+%kubectl apply -f gemfire1.yaml
+%kubectl get pod
+NAME                                                    READY   STATUS    RESTARTS   AGE
+gemfire1-locator-0                                      1/1     Running   0          2m21s
+gemfire1-server-0                                       1/1     Running   0          76s
+gemfire1-server-1                                       1/1     Running   0          76s
+gemifire-operator-controller-manager-6cd95c5cdd-g49lb   2/2     Running   0          8m
+

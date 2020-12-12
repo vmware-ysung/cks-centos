@@ -1,0 +1,9 @@
+- hosts: all
+  gather_facts: no
+  become: yes
+  tags: cloud-config
+  tasks:
+  - name: Copy cloud-config
+    copy:
+      src: ../cloud-config
+      dest: /etc/kubernetes/cloud-config
