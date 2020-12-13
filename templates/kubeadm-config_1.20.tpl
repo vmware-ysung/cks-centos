@@ -1,10 +1,18 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 bootstrapTokens:
+- groups:
+  - system:bootstrappers:kubeadm:default-node-token
+  token: medium.howtok5678songce
+  ttl: 24h0m0s
+  usages:
+  - signing
+  - authentication
 localAPIEndpoint:
   advertiseAddress: 1.2.3.4
   bindPort: 6443
 nodeRegistration:
+  criSocket: "/var/run/containerd/containerd.sock"
   name: cks-master1
   taints:
   - effect: NoSchedule

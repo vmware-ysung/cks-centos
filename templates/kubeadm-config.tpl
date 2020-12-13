@@ -1,6 +1,7 @@
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 nodeRegistration:
+  criSocket: "/var/run/containerd/containerd.sock"
   kubeletExtraArgs:
     feature-gates: "EphemeralContainers=true"
     cloud-provider: gce

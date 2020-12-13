@@ -208,6 +208,8 @@ resource "local_file" "cloud_config" {
 resource "null_resource" "ansible_playbook_os" {
   depends_on = [
 	local_file.ansible_host,
+  google_compute_instance.cks-masters,
+  google_compute_instance.cks-workers,
   ]
   provisioner "local-exec" {
     command = "ansible-playbook os/main.yaml --extra-vars='k8s_ver=${var.k8s_version}'"

@@ -1,8 +1,8 @@
 [master]
-%{ for ip in cks_master ~}
-${ip}
+%{ for index,ip in cks_master ~}
+master-${index+1} ansible_host=${ip}
 %{ endfor ~}
 [worker]
-%{ for ip in cks_worker ~}
-${ip}
+%{ for index,ip in cks_worker ~}
+worker-${index+1} ansible_host=${ip}
 %{ endfor ~}
