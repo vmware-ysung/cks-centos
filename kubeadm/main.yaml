@@ -7,7 +7,7 @@
     copy:
       src: cloud-config
       dest: /etc/kubernetes/cloud-config
-- hosts: master
+- hosts: master-1
   gather_facts: no
   become: yes
   environment:
@@ -30,7 +30,7 @@
   - name: Generate join token
     shell: kubeadm token create --print-join-command
     register: join_command
-    delegate_to: "{{ groups['master'][0] }}"
+    delegate_to: master-1
   - set_fact:
       kubeadm_join: "{{ join_command.stdout }}"
   - name: Run kubeadm join
@@ -49,7 +49,7 @@
       name: kubelet
       state: restarted
       daemon_reload: yes
-- hosts: master
+- hosts: master-1
   gather_facts: no
   become: yes
   tags: cni
