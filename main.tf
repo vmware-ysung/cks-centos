@@ -22,7 +22,7 @@ resource "google_compute_network" "cks_network" {
   auto_create_subnetworks = false
   provisioner "local-exec" {
     when    = destroy
-    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet"
+    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet&&gcloud compute disk list --filter=\"name~'kubernetes-dynamic-pvc*'\" --uri | xargs gcloud compute disks delete --quiet "
   }
 }
 
