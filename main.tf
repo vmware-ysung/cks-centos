@@ -173,7 +173,6 @@ resource "google_dns_record_set" "cks_workers" {
 }
 
 resource "local_file" "ansible_host" {
-<<<<<<< HEAD
  content = templatefile("templates/hosts.tpl",
 	   {
      cks_master = google_compute_instance.cks-masters.*.network_interface.0.access_config.0.nat_ip
@@ -181,15 +180,6 @@ resource "local_file" "ansible_host" {
 	   }
 	)
  filename = "${path.module}/hosts"
-=======
-  content = templatefile("templates/hosts.tpl",
-    {
-      cks_master = google_compute_instance.cks-masters.*.network_interface.0.access_config.0.nat_ip
-      cks_worker = google_compute_instance.cks-workers.*.network_interface.0.access_config.0.nat_ip
-    }
-  )
-  filename = "${path.module}/hosts"
->>>>>>> origin/main
 }
 
 resource "local_file" "kubeadm_config" {
