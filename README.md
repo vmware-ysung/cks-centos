@@ -83,7 +83,7 @@ variable "gcp_public_dns_zone" {
 variable "vpc_subnet_cidr" {
   description  = "VPC custom subnet CIDR"
   type          = string
-  default       = "10.240.0.0/24"
+  default       = "192.168.20.0/24"
 }
 
 variable "k8s_pod_cidr" {
@@ -130,4 +130,8 @@ cks-centos %terraform destroy --auto-approve
 ## ToDo:
 - [] Instance groups
 - [] Kubeadm upgrade
-- [] Control plane HA
+- [x] Control plane HA
+  - GCP LoadBalancer: Layer4 TCP Load Balancer
+  - GCP SSL health check (haproxy + keepalived)
+  - GCP target pool
+  - kubeadm join --control-plane
