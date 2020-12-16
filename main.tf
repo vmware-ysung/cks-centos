@@ -281,10 +281,4 @@ resource "null_resource" "ansible_playbook_kubectl" {
       private_ip  = google_compute_instance.cks-masters[0].network_interface.0.network_ip
     }
   }
-<<<<<<< HEAD
 }
-
-
-=======
-}
->>>>>>> origin/main

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-- hosts: master-1
-=======
 - hosts: localhost
->>>>>>> origin/main
   gather_facts: no
   tasks:
   - name: Fetching admin.conf
@@ -28,16 +24,5 @@
   #   shell: "kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
   - name: Add gcc secret
     tags: gcrsecret
-<<<<<<< HEAD
-    shell: kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"
-  # - name: K8S dashboard UI
-  #   shell: kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
-=======
-    shell: 'kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"'
   - name: Add ingress controller
     shell: 'kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml'
-
-   # - name: K8S dashboard UI
-   #   shell: "kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml"
-
->>>>>>> origin/main
