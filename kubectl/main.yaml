@@ -24,7 +24,7 @@
   #   shell: "kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.0/cert-manager.yaml"
   - name: Add gcc secret
     tags: gcrsecret
-    shell: 'kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat ~/.ssh/vmware-ysung.json)"'
+    shell: 'kubectl create secret docker-registry regsecret --docker-server=gcr.io --docker-username=_json_key --docker-password="$(cat {{gcp_credential}})"'
   - name: Add ingress controller
     shell: 'kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml'
 

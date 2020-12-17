@@ -6,7 +6,7 @@ provider "google" {
 }
 
 data "google_dns_managed_zone" "cks_public_zone" {
-  name = var.gcp_public_dns_zone
+  name = var.gcp_public_dns_zone.zone_name
 }
 
 data "external" "myipaddr" {
@@ -22,7 +22,7 @@ resource "google_compute_network" "cks_network" {
   auto_create_subnetworks = false
   provisioner "local-exec" {
     when    = destroy
-    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet&&gcloud compute disk list --filter=\"name~'kubernetes-dynamic-pvc*'\" --uri | xargs gcloud compute disks delete --quiet "
+    command = "gcloud compute routes list --filter=\"name~'kubernetes*'\" --uri | xargs gcloud compute routes delete --quiet &&  gcloud compute firewall-rules list --filter=\"name~'k8s*'\" --uri | xargs gcloud compute firewall-rules delete --quiet&&gcloud compute disks list --filter=\"name~'kubernetes-dynamic-pvc*'\" --uri | xargs gcloud compute disks delete --quiet "
   }
 }
 
@@ -90,6 +90,7 @@ resource "google_compute_firewall" "cks_allow_nodeports_external" {
 }
 
 resource "google_dns_record_set" "cks_masters_external" {
+  count = var.gcp_public_dns_zone.enabled ? 1 : 0
   name         = "cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}"
   type         = "A"
   ttl          = 300
@@ -189,7 +190,7 @@ resource "local_file" "kubeadm_config" {
       k8s_version          = var.k8s_version
       k8s_pod_cidr         = var.k8s_pod_cidr
       k8s_private_dns_name = trimsuffix(var.gcp_private_dns_zone.dns_name, ".")
-      k8s_public_dns_name  = trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".")
+      k8s_public_dns_name  = var.gcp_public_dns_zone.enabled ? trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".") : "kubernetes"
       api_public_ip        = google_compute_address.lb_ext_ip.address
     }
   )
@@ -233,10 +234,11 @@ resource "null_resource" "ansible_playbook_kubectl" {
     null_resource.ansible_playbook_kubeadm,
   ]
   provisioner "local-exec" {
-    command = "ansible-playbook kubectl/main.yaml --extra-vars=\"k8s_public_ip=$public_fqdn k8s_private_ip=$private_ip\""
+    command = "ansible-playbook kubectl/main.yaml --extra-vars=\"k8s_public_ip=$public_fqdn k8s_private_ip=$private_ip gcp_credential=$gcp_cred\""
     environment = {
-      public_fqdn = trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".")
+      public_fqdn = var.gcp_public_dns_zone.enabled ? trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".") : "kubernetes"
       private_ip  = google_compute_instance.cks-masters[0].network_interface.0.network_ip
+      gcp_cred = var.gcp_profile.credentials
     }
   }
 }

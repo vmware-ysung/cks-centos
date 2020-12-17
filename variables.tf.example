@@ -51,8 +51,11 @@ variable "gcp_private_dns_zone" {
 
 variable "gcp_public_dns_zone" {
   description = "Google Managed DNS zone - public (preconfig required)"
-  type = string
-  default = "my-public-zone"
+  type = map
+  default = {
+    enabled = false
+    zone_name = "my-public-zone"
+  }
 }
 
 variable "vpc_subnet_cidr" {
