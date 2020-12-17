@@ -75,9 +75,13 @@ variable "gcp_private_dns_zone" {
 }
 
 variable "gcp_public_dns_zone" {
-  description = "Google Managed DNS zone - public (preconfig required)"
-  type = string
-  default = "xxxxx-public-vmware-zone"     <== OPTIOINAL: Your Google Cloud Managed Zone (public)
+  description = "Google Managed DNS zone - public (preconfig required). If no public zone, external api uses public IP"
+  type = map
+  default = {
+    enabled = false   <== OPTIOINAL: google domain resource requires 24hrs to be affected. You need to pre config a google domain in advance, then create a public DNS zone.
+    zone_name = "ysung-public-vmware-zone"
+  }
+
 }
 
 variable "vpc_subnet_cidr" {

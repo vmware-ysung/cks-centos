@@ -236,7 +236,7 @@ resource "null_resource" "ansible_playbook_kubectl" {
   provisioner "local-exec" {
     command = "ansible-playbook kubectl/main.yaml --extra-vars=\"k8s_public_ip=$public_fqdn k8s_private_ip=$private_ip gcp_credential=$gcp_cred\""
     environment = {
-      public_fqdn = var.gcp_public_dns_zone.enabled ? trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".") : "kubernetes"
+      public_fqdn = var.gcp_public_dns_zone.enabled ? trimsuffix("cks.${data.google_dns_managed_zone.cks_public_zone.dns_name}", ".") : google_compute_address.lb_ext_ip.address
       private_ip  = google_compute_instance.cks-masters[0].network_interface.0.network_ip
       gcp_cred = var.gcp_profile.credentials
     }
